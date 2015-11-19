@@ -1,0 +1,14 @@
+.data
+###################### data needed for dictionary.asm
+fileName:
+	.asciiz	"    "
+dictionary:
+	.space 500000
+dictionaryArray:
+	.align	2
+	.space 368000
+lengthOfList:
+	.word	0
+wordInBox:
+	.align	0
+	.space 10
