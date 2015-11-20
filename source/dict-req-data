@@ -12,3 +12,6 @@ lengthOfList:
 wordInBox:
 	.align	0
 	.space 10
+correctWordsPointerArray:
+	.align	2
+	.space 50000

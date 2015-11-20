@@ -61,3 +61,50 @@ fillDictionaryArrayReturn:	# dictionary array is completely loaded
 	sw $v1, lengthOfList	# store wordCount
 	jr $ra
 
+#############################################
+
+# get a 9 letter word from the dictionary array
+getNineLetter:
+	subi $sp, $sp, 4	# move stack pointer
+	sw $ra, ($sp)		# store return address on the stack
+	la $t9, dictionaryArray	# load address of dictionary array into $t9
+getNineLetLoop:
+	lw $a0, lengthOfList	# load length of the word list to $a0 for random number function
+	jal randNum		# get a random number returned to $v0
+	move $t8, $v0		# store random number in $t8
+	WordArray ($a0, $t9, $t8)	# picks a random word from the word array, stores in $a0
+	jal getLength		# gets length of word in $a0, returns to $v1
+	beq $v1, 10, getNineLetrReturn	# if $v1 = 10, it found the 9 letter word, jump to return
+	j getNineLetLoop	# go back to loop again, look for 9 letter word
+getNineLetReturn:
+	la $s3, wordInBox	# load address of space to $s3
+	move $s4, $t8		# move random number to $s4
+	WordArray ($s2, $t9, $s2)	
+	li $t0, 0		# store zero in $t0 ( counter )
+getNineLetReturnLoop:
+	beq $t0, 11, fillCorrectArray	# when counter hits 11, jump to filling the array
+	lb $t1, ($s2)		# load letter from $s2 into $t1
+	sb $t1, ($s3)		# store letter into wordInBox
+	add $s3, $s3, 1		# increment wordInBox space by 1
+	add $s2, $s2, 1		# increment pointer to letter by 1
+	add $t0, $t0, 1		# increment counter
+	j getNineLetReturnLoop	# loop
+fillCorrectArray:
+
+fillCorrectArrayFindTop:
+	addi $s4, $s4, -1	# reduce the randum number by 1
+	
+	WordArray ($a0, $t9, $s4)	# get a letter from the $s4 position of the list
+	lb $t0, ($a0)		# load the letter to $t0
+	beq $t0, '*', fillCorrectTopFound	# the * is the seperator between word lists
+	j fillCorrectArrayFindTop	# loop up, * not found
+fillCorrectTopFound:
+	li $t0, 0		# set $t0 to zero
+	addi $s4, $s4, 2	# add 2 to the number in $s4
+	la $s5, correctWordsPointerArray	# load address of the words array to $s5
+fillCorrectArrayloop:
+	WordArray ($a0, $t9, $s4)	# store letter address in $a0
+	lb $t0, ($a0)		# load letter to $t0
+	beq $t0, '*', fillCorrectArrayReturn	# end of words for this 9 letter word
+	sw $t0, ($s5)		# store letter address to correctWordsPointerArray[i]
+	
