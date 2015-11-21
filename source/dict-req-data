@@ -15,3 +15,5 @@ wordInBox:
 correctWordsPointerArray:
 	.align	2
 	.space 50000
+totalPossibleWords:
+	.word 0

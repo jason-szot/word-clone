@@ -65,8 +65,12 @@ fillDictionaryArrayReturn:	# dictionary array is completely loaded
 
 # get a 9 letter word from the dictionary array
 getNineLetter:
-	subi $sp, $sp, 4	# move stack pointer
+	subi $sp, $sp, 20	# move stack pointer
 	sw $ra, ($sp)		# store return address on the stack
+	sw $s2, 4($sp)		# store $s2 in stack
+	sw $s3, 8($sp)		# store $s3 on stack
+	sw $s4, 12($sp)		# store $s4 on stack
+	sw $s5, 16($sp)		# store $s5 on stack
 	la $t9, dictionaryArray	# load address of dictionary array into $t9
 getNineLetLoop:
 	lw $a0, lengthOfList	# load length of the word list to $a0 for random number function
@@ -74,7 +78,7 @@ getNineLetLoop:
 	move $t8, $v0		# store random number in $t8
 	WordArray ($a0, $t9, $t8)	# picks a random word from the word array, stores in $a0
 	jal getLength		# gets length of word in $a0, returns to $v1
-	beq $v1, 10, getNineLetrReturn	# if $v1 = 10, it found the 9 letter word, jump to return
+	beq $v1, 10, getNineLetReturn	# if $v1 = 10, it found the 9 letter word, jump to return
 	j getNineLetLoop	# go back to loop again, look for 9 letter word
 getNineLetReturn:
 	la $s3, wordInBox	# load address of space to $s3
@@ -107,4 +111,17 @@ fillCorrectArrayloop:
 	lb $t0, ($a0)		# load letter to $t0
 	beq $t0, '*', fillCorrectArrayReturn	# end of words for this 9 letter word
 	sw $t0, ($s5)		# store letter address to correctWordsPointerArray[i]
+	lw $t8, totalPossibleWords	# load wordCount for correct words in $t8
+	addi $s4, $s4, 1		# increment pos for wordArray[pos]
+	addi $s5, $s5, 1		# increment correctWordsPointerArray
+	j fillCorrectArrayLoop		# loop
+fillCorrectArrayReturn:
 	
+getNineLetReturn:
+	lw $ra, ($sp)		# load return address from stack
+	lw $s2, 4($sp)		# load $s2 from stack
+	lw $s3, 8($sp)		# load $s3 from stack
+	lw $s4, 12($sp)		# load $s4 from stack
+	lw $s5, 16($sp)		# load $s5 from stack
+	subi $sp, $sp, 20	# move stack pointer
+	jr $ra			# return
