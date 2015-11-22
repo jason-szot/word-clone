@@ -65,7 +65,7 @@ checkNull2:
   beq $t4, 0, wrongUserInput #If they are the same string, the string has been entered before
   j comparisonLoop2
 
-addToFoundWords:       #$s7 stores the offset needed to find an empty space in the wordArray array. You can store a new word at that offset.
+addToFoundWords:        #$s7 stores the offset needed to find an empty space in the wordArray array. You can store a new word at that offset.
   beq $t0, $s7, addWord 
   $t0, $t0, 4 #Continuously add 4 to $t0 until it equals $s7
 addWord:
