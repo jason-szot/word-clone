@@ -1,10 +1,10 @@
 #assumption: the user input is stored in $s0
-#$t7 points to the base address of a string in dictionaryArray
+#$t7 points to the base address of a string in correctWordsPointerArray
 #$t6 is used to offset and store the offset into $t5
 #$t5 is pointer to individual characters in the elements in the array
 #$t4 contains the loaded character that $t5 is pointing to
 #$t1 is the counter to offset $t6 by
-#$t0 counter for offsetting dictionaryArray
+#$t0 counter for offsetting correctWordsPointerArray
 #$s1 is a pointer to an individual character in the user input string
 #$s2 contains the loaded character that $s1 is pointing to
 .text
@@ -12,7 +12,7 @@
 compareWords: 
   add $t1, $zero, $zero #reset the offset counter 
   beq $t0, $a0, wrongUserInput #indicates that the user input was not found in the dictionary
-  lw $t7, dictionaryArray($t0)  #idk what the dictionary words label is going to be
+  lw $t7, correctWordsPointerArray($t0)  #idk what the dictionary words label is going to be
   addi $t0, $t0, 4 #counter for how many words have been checked
   add $t6, $t7, $zero #$t6 points to the base address of a string
 
