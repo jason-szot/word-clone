@@ -4,7 +4,6 @@ The Power Friends team project for Comp Architecture
 move items done from Todo to Done
 
 Todo:
-randomize 9 letter word
 validate user input
 -character used
 -word guessed already
@@ -18,3 +17,7 @@ Done:
 random letter pick
 
 get words from library file loaded into memory
+
+randomize 9 letter word
+
+shuffle word saving center letter
