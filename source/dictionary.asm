@@ -40,7 +40,7 @@ importFile:
 fillDictionaryArray:
 	la $a0, dictionary	# dictionary space pointer in $a0 ( scanner )
 	la $a1, dictionaryArray	# dictionaryArray[0] in $a1
-	sw $a0, (a1)		# store pointer position to dictionaryArray[0]
+	sw $a0, ($a1)		# store pointer position to dictionaryArray[0]
 	add $v1, $0, $0		# wordCount stored in $v1, initialize to 0
 	add $v1, $v1, 1		# add 1 to wordCount
 	add $a1, $a1, 4		# $a1 i for dictionaryArray[i]
@@ -64,25 +64,27 @@ fillDictionaryArrayReturn:	# dictionary array is completely loaded
 #############################################
 
 # get a 9 letter word from the dictionary array
+# $s2 - $s6 used in this routine, save on stack and restore before return
 getNineLetter:
-	subi $sp, $sp, 20	# move stack pointer
+	subi $sp, $sp, 24	# move stack pointer
 	sw $ra, ($sp)		# store return address on the stack
 	sw $s2, 4($sp)		# store $s2 in stack
 	sw $s3, 8($sp)		# store $s3 on stack
 	sw $s4, 12($sp)		# store $s4 on stack
 	sw $s5, 16($sp)		# store $s5 on stack
+	sw $s6, 20($sp)		# store $s6 to stack
 	la $t9, dictionaryArray	# load address of dictionary array into $t9
 getNineLetLoop:
 	lw $a0, lengthOfList	# load length of the word list to $a0 for random number function
 	jal randNum		# get a random number returned to $v0
-	move $t8, $v0		# store random number in $t8
-	WordArray ($a0, $t9, $t8)	# picks a random word from the word array, stores in $a0
+	move $s6, $v0		# store random number in $t8
+	WordArray ($a0, $t9, $s6)	# picks a random word from the word array, stores in $a0
 	jal getLength		# gets length of word in $a0, returns to $v1
 	beq $v1, 10, getNineLetReturn	# if $v1 = 10, it found the 9 letter word, jump to return
 	j getNineLetLoop	# go back to loop again, look for 9 letter word
 getNineLetReturn:
 	la $s3, wordInBox	# load address of space to $s3
-	move $s4, $t8		# move random number to $s4
+	move $s4, $s6		# move random number to $s4
 	WordArray ($s2, $t9, $s2)	
 	li $t0, 0		# store zero in $t0 ( counter )
 getNineLetReturnLoop:
@@ -123,5 +125,89 @@ getNineLetReturn:
 	lw $s3, 8($sp)		# load $s3 from stack
 	lw $s4, 12($sp)		# load $s4 from stack
 	lw $s5, 16($sp)		# load $s5 from stack
+	lw $s6, 20($sp)		# load $s6 from stack
 	subi $sp, $sp, 20	# move stack pointer
 	jr $ra			# return
+
+##############################################################
+
+# randomize the word to be shown
+# rand int mod 9 swap pos 0-8 with rand num mod 9 
+# DOES NOT RETAIN CENTER LETTER
+
+# AGAIN DOES NOT RETAIN CENTER LETTER.. USE SHUFFLE FOR THAT
+
+randomizeWord:
+	add $t0, $zero, $zero	# initialize counter to zero ( will be pos to swap )
+	add $t9, $zero, $zero	# for randomizer counter ( want to run this routine 5 times )
+randomWordLoop:
+	beq $t9, 5, randomWordDone	# randomized 5 times
+	addi $v0, $zero, 30	# get time
+	syscall
+	addi $v0, $zero, 40	# set seed for random from return of time
+	syscall
+	addi $vo, $zero, 41	# random int return to $a0
+	syscall
+	move $t1, $a0		# save rand number to $t1
+	addi $t2, $zero, 9	# for mod 9
+	divu $t1, $t2		# $t1 mod $t2 ( randint MOD 9
+	mfhi $t1		# number saved to $t1
+	beq $t0, 8, randomWordReturn	# case to exit
+	# swap $t0 letter with $t1 letter
+	lb $t3, wordInBox($t0)	# load char at $t0 to $t3
+	lb $t4, wordInBox($t1)	# load char at $t1 to $t4
+	sb $t3, wordInBox($t1)	# store char from $t3 to $t1
+	sb $t4, wordInBox($t0)	# store char from $t4 to $t0
+	# characters swapped
+	addi $t0, $t0, 1	# counter++
+	j randomWordLoop	# loop up
+randomWordReturn:
+	addi $t9, $t9, 1	# add to random counter
+	j randomWordLoop	# randomize again
+randomWordDone:
+	jr $ra			# return
+	
+##########################################################
+
+# shuffle - same algorithm as randomize, but leave spot 4 alone
+
+shuffleWord:
+	add $t0, $zero, $zero		# initialize $t0 to zero ( pos to swap )
+shuffleWordLoop:
+	beq $t0, 9, shuffleWordReturn	# done with shuffle
+	beq $t0, 4, shuffleIncreaseCounter	# to save center letter
+	addi $v0, $zero, 30	# get time
+	syscall
+	addi $v0, $zero, 40	# set seed for random from return of time
+	syscall
+	addi $vo, $zero, 41	# random int return to $a0
+	syscall
+	move $t1, $a0		# save rand number to $t1
+	addi $t2, $zero, 9	# for mod 9
+	divu $t1, $t2		# $t1 mod $t2 ( randint MOD 9
+	mfhi $t1		# number saved to $t1
+	bne $t1, 4, shuffleContinue	# saves center letter
+	j shuffleWordLoop	# loop up, random number was 4
+shuffleContinue:
+	beq $t0, $t1, shuffleWordLoop	# same position, wouldnt swap
+	# swap characters in $t0 and $t1 positions
+	lb $t3, wordInBox($t0)	# load char at $t0 to $t3
+	lb $t4, wordInBox($t1)	# load char at $t1 to $t4
+	sb $t3, wordInBox($t1)	# store char from $t3 to $t1
+	sb $t4, wordInBox($t0)	# store char from $t4 to $t0
+	# characters swapped
+shuffleIncreaseCounter:
+	addi $t0, $t0, 1	# counter += 1
+	j shuffleWordLoop	# jump back to loop
+shuffleWordReturn:
+	jr $ra			# returnn to $ra
+
+################################################################
+
+# get the center letter
+# CenterLetter = wordInBox[4]
+getCenterLetter:
+	la $t0, wordInBox	# load address of 9 letter char array
+	lb $t1, 4($t0)		# load character from pos 4
+	sb $t1, CenterLetter	# store character in variale CenterLetter
+	

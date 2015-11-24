@@ -17,3 +17,15 @@ correctWordsPointerArray:
 	.space 50000
 totalPossibleWords:
 	.word 0
+CenterLetter:
+	.byte 'A'
+
+##################### for printBox.asm
+gridlong:
+	.asciiz "\n\t|---+---+---|\t\t"
+gridLeft:
+	.asciiz "\t| "
+gridMiddle:
+	.asciiz " | "
+gridRight:
+	.asciiz " |\t\t"
