@@ -10,30 +10,30 @@
 .text
   sll $a0, $v1, 2 #multiply string count by 4, for comparison to my array counter
 compareWords: 
-  add $t1, $zero, $zero #reset the offset counter 
-  beq $t0, $a0, wrongUserInput #indicates that the user input was not found in the dictionary
-  lw $t7, correctWordsPointerArray($t0)  #idk what the dictionary words label is going to be
-  addi $t0, $t0, 4 #counter for how many words have been checked
-  add $t6, $t7, $zero #$t6 points to the base address of a string
+  add $t1, $zero, $zero                    #reset the offset counter 
+  beq $t0, $a0, wrongUserInput             #indicates that the user input was not found in the dictionary
+  lw $t7, correctWordsPointerArray($t0)        #idk what the dictionary words label is going to be
+  addi $t0, $t0, 4                         #counter for how many words have been checked
+  add $t6, $t7, $zero                        #$t6 points to the base address of a string
 
 comparisonLoop:
-  addi $t5, $t6, $t1 #points to the character at the $t1-th spot in the loaded string ($t1 = i in String[i])
-  lb $t4, ($t5) #loads that character into $t4
-  add $s1, $s0, $t1 #Points to the character in the same position from the user input
-  lb $s2, ($s1) #Loads the character into $s2
-  addi $t1, $t1, 1 #increment position
-  beq $t4, $s2, checkNull #If the 2 are the same character, check to see if they are both null
-  bne $t4, $s2, compareWords #If not, go to the next word in the array, as the user input is not equal to this one
+  addi $t5, $t6, $t1                      #points to the character at the $t1-th spot in the loaded string ($t1 = i in String[i])
+  lb $t4, ($t5)                           #loads that character into $t4
+  add $s1, $s0, $t1                       #Points to the character in the same position from the user input
+  lb $s2, ($s1)                           #Loads the character into $s2
+  addi $t1, $t1, 1                         #increment position
+  beq $t4, $s2, checkNull                 #If the 2 are the same character, check to see if they are both null
+  bne $t4, $s2, compareWords                #If not, go to the next word in the array, as the user input is not equal to this one
 
 
 
 checkNull:
-  beq $t4, 0, moveToFoundWords #Check to see if this word has been entered before, as it is a correct word
+  beq $t4, 0, moveToFoundWords         #Check to see if this word has been entered before, as it is a correct word
   j comparisonLoop
 
 moveToFoundWords: 
   add $t4, $zero, $zero
-  add $t0, $zero, $zero #clear counters
+  add $t0, $zero, $zero           #clear counters
 
 
 #$t5 is the offset for $t3 and $s0
@@ -47,28 +47,28 @@ moveToFoundWords:
 #$s0 contains the user input
 compareFoundWords: 
   add $t4, $zero, $zero
-  beq $t0, $s7, addToFoundWords #The word was not found in wordArray, so it is a new correct word that must be entered
-  lw $t1, wordArray($t0) #load wordArray[i], where $t0 is i
-  addi $t0, $t0, 4 #increment wordArray offset
-  add $t2, $t1, $zero #t2 points to base address of a string
+  beq $t0, $s7, addToFoundWords                     #The word was not found in wordArray, so it is a new correct word that must be entered
+  lw $t1, wordArray($t0)                            #load wordArray[i], where $t0 is i
+  addi $t0, $t0, 4                                  #increment wordArray offset
+  add $t2, $t1, $zero                               #t2 points to base address of a string
 comparisonLoop2:
-  addi $t3, $t2, $t5 #Points to character at the $t5-th offset of the string pointed to by $t2
-  lb $t4, ($t3) #Load character into $t4
-  add $s1, $s0, $t5 #Point to character in same position from user input
-  lb $s2, ($s1) #Load character into $s2
-  addi $t5, $t5, 1 #Increment counter
-  beq $t4, $s2, checkNull2 #If they are equal, check to see if they are both '0', that means they are the same string
-  bne $t4, $s2, compareFoundWords #If not, move on to the next string in the array
+  addi $t3, $t2, $t5                                #Points to character at the $t5-th offset of the string pointed to by $t2
+  lb $t4, ($t3)                                     #Load character into $t4
+  add $s1, $s0, $t5                                 #Point to character in same position from user input
+  lb $s2, ($s1)                                     #Load character into $s2
+  addi $t5, $t5, 1                                  #Increment counter
+  beq $t4, $s2, checkNull2                          #If they are equal, check to see if they are both '0', that means they are the same string
+  bne $t4, $s2, compareFoundWords                   #If not, move on to the next string in the array
 
 
 checkNull2:
-  beq $t4, 0, wrongUserInput #If they are the same string, the string has been entered before
+  beq $t4, 0, wrongUserInput                        #If they are the same string, the string has been entered before
   j comparisonLoop2
 
 addToFoundWords:        #$s7 stores the offset needed to find an empty space in the wordArray array. You can store a new word at that offset.
   beq $t0, $s7, addWord 
-  $t0, $t0, 4 #Continuously add 4 to $t0 until it equals $s7
+  $t0, $t0, 4                               #Continuously add 4 to $t0 until it equals $s7
 addWord:
-  sw $t6, wordArray($t0) #$t6 should still be a pointer to the address of the string that was entered. Store this address in the wordArray
-  addi $s7, $s7, 4 # Increment $s7
+  sw $t6, wordArray($t0)                    #$t6 should still be a pointer to the address of the string that was entered. Store this address in the wordArray
+  addi $s7, $s7, 4                          # Increment $s7
   j rightUserInput
