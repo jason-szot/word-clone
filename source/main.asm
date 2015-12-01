@@ -10,7 +10,7 @@
 		.include "compareWords.asm"
 		.include "validateInput.asm"
 		.include "setup.asm"
-		.include "printWordBox.asm"
+		.include "printBox.asm"
 
 main:
 	
