@@ -4,11 +4,11 @@
 
 # get a file name to load
 getFileName:
-	li $vo, 41		# 41 is rand int
+	li $v0, 41		# 41 is rand int
 	syscall
 	divu $t0, $a0, 26	# mod by 26 ( number of letters )
 	mfhi $v0		# move from hi (rand MOD 26)
-	addi $vo, $vo, 'A'	# convert rand mod 26 to capital letter
+	addi $v0, $v0, 'A'	# convert rand mod 26 to capital letter
 	la $t1, fileName	# fileName loaded into $t1
 	sb $v0, ($t1)		# store letter in fileName[0]
 	sb $0, 1($t1)		# store NULL in fileName[1]
@@ -50,7 +50,7 @@ fillDictionaryArrayLoop:
 	bne $t0, 10, fillSkipped	# didnt hit newline, move forward
 	sb $zero, ($a0)		# replace newline with NULL
 	add $a0, $a0, 1		# scanner++
-	sw $a0, (a1)		# dictionaryArray[i] = scanner
+	sw $a0, ($a1)		# dictionaryArray[i] = scanner
 	add $a1, $a1, 4		# i++
 	add $v1, $v1, 1		# wordCount++
 	j fillDictionaryArrayLoop
@@ -76,7 +76,7 @@ getNineLetter:
 	la $t9, dictionaryArray	# load address of dictionary array into $t9
 getNineLetLoop:
 	lw $a0, lengthOfList	# load length of the word list to $a0 for random number function
-	jal randNum		# get a random number returned to $v0
+	jal randNumber		# get a random number returned to $v0
 	move $s6, $v0		# store random number in $t8
 	WordArray ($a0, $t9, $s6)	# picks a random word from the word array, stores in $a0
 	jal getLength		# gets length of word in $a0, returns to $v1
@@ -108,7 +108,7 @@ fillCorrectTopFound:
 	li $t0, 0		# set $t0 to zero
 	addi $s4, $s4, 2	# add 2 to the number in $s4
 	la $s5, correctWordsPointerArray	# load address of the words array to $s5
-fillCorrectArrayloop:
+fillCorrectArrayLoop:
 	WordArray ($a0, $t9, $s4)	# store letter address in $a0
 	lb $t0, ($a0)		# load letter to $t0
 	beq $t0, '*', fillCorrectArrayReturn	# end of words for this 9 letter word
@@ -119,7 +119,7 @@ fillCorrectArrayloop:
 	j fillCorrectArrayLoop		# loop
 fillCorrectArrayReturn:
 	
-getNineLetReturn:
+getNineLetReturn_2:
 	lw $ra, ($sp)		# load return address from stack
 	lw $s2, 4($sp)		# load $s2 from stack
 	lw $s3, 8($sp)		# load $s3 from stack
@@ -146,7 +146,7 @@ randomWordLoop:
 	syscall
 	addi $v0, $zero, 40	# set seed for random from return of time
 	syscall
-	addi $vo, $zero, 41	# random int return to $a0
+	addi $v0, $zero, 41	# random int return to $a0
 	syscall
 	move $t1, $a0		# save rand number to $t1
 	addi $t2, $zero, 9	# for mod 9
@@ -180,7 +180,7 @@ shuffleWordLoop:
 	syscall
 	addi $v0, $zero, 40	# set seed for random from return of time
 	syscall
-	addi $vo, $zero, 41	# random int return to $a0
+	addi $v0, $zero, 41	# random int return to $a0
 	syscall
 	move $t1, $a0		# save rand number to $t1
 	addi $t2, $zero, 9	# for mod 9
