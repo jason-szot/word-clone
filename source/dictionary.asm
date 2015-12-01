@@ -4,11 +4,11 @@
 
 # get a file name to load
 getFileName:
-	li $vo, 41		# 41 is rand int
+	li $v0, 41		# 41 is rand int
 	syscall
 	divu $t0, $a0, 26	# mod by 26 ( number of letters )
 	mfhi $v0		# move from hi (rand MOD 26)
-	addi $vo, $vo, 'A'	# convert rand mod 26 to capital letter
+	addi $v0, $v0, 'A'	# convert rand mod 26 to capital letter
 	la $t1, fileName	# fileName loaded into $t1
 	sb $v0, ($t1)		# store letter in fileName[0]
 	sb $zero, 1($t1)		# store NULL in fileName[1]
@@ -59,7 +59,7 @@ fillDictionaryArrayLoop:
 	bne $t0, 10, fillSkipped	# didnt hit newline, move forward
 	sb $zero, ($a0)		# replace newline with NULL
 	add $a0, $a0, 1		# scanner++
-	sw $a0, (a1)		# dictionaryArray[i] = scanner
+	sw $a0, ($a1)		# dictionaryArray[i] = scanner
 	add $a1, $a1, 4		# i++
 	add $v1, $v1, 1		# wordCount++
 	j fillDictionaryArrayLoop
