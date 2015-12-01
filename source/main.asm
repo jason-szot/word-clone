@@ -27,8 +27,13 @@ endGame:
 	li $v0, 10		# system call for end program. 
 	syscall
 
+
+
+############################################################
+################	data for program	####################
+############################################################
 		.data
-	# main.asm variables/strings
+		# main.asm variables/strings
 header:		.asciiz "######## Lexathon #########\n"
 helloLabel:	.asciiz " ** Welcome to Lexathon **"
 startPrompt:	.asciiz "\n\n Would you like to start a new game?: "
@@ -47,7 +52,7 @@ validText: 	.asciiz "Word found! Good job!"
 totalScore: 	.asciiz "\nTotal Score: "
 currentScore:   .word 0
 correctWords:	.word 0
-scoreText:	.asciiz "\nScore: "
+scoreText:	.asciiz "Current Score: "
 wordsFound:	.asciiz "Words Found: "
 wordLength:	.word 6
 
@@ -63,9 +68,10 @@ wordArray:	.space 10000
 fileName:
 	.asciiz	"    "
 dictionary:
+	.align 4
 	.space 500000
 dictionaryArray:
-	.align	2
+	.align	4
 	.space 368000
 lengthOfList:
 	.word	0
@@ -73,7 +79,7 @@ wordInBox:
 	.align	0
 	.space 10
 correctWordsPointerArray:
-	.align	2
+	.align	4
 	.space 50000
 totalPossibleWords:
 	.word 0
@@ -89,3 +95,23 @@ gridMiddle:
 	.asciiz " | "
 gridRight:
 	.asciiz " |\t\t"
+
+###################### Prints for when the program is loading certain aspects of operation
+loadingFilePrint:
+	.asciiz "Reading dictionary file ... "
+loadingIntoMemoryPrint:
+	.asciiz "Loading words into memory ... "
+
+##################### Menu lines
+menuLine1:
+	.asciiz "Menu:\n"
+menuLine2:
+	.asciiz "1. Shuffle letters.\n"
+menuLine3:
+	.asciiz "2. Guess a word.\n"
+menuLine4:
+	.asciiz "3. Quit.\n"
+menuLine5:
+	.asciiz "-------------------\n"
+menuLineInput:
+	.asciiz "Enter your choice:  "

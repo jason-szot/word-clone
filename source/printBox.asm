@@ -5,7 +5,7 @@
 #	| 3 | 4 | 5 |		3. Quit.
 #	|---+---+---|		-------------------
 #	| 6 | 7 | 8 |		
-#	|---+---+---|
+#	|---+---+---|		Current Score: ####
 #	Enter your choice:  
 #
 ################################################################
@@ -13,6 +13,7 @@
 # tons of syscalls ( yuck!! )
 printWordBox:
 	la $t0, wordInBox	# load wordInBox to $t0
+	la $t1, currentScore	# load score
 	
 	# start printing box
 	#top line
@@ -147,6 +148,15 @@ printWordBox:
 	syscall
 	
 	################ menu line or newline
+	la 	$a0, scoreText
+	li 	$v0, 4
+	syscall
+
+	currentScore
+	li	$v0, 1		# a number
+	lw	$a0, 0($t1)
+	syscall
+	
 	la 	$a0, newLine
 	li 	$v0, 4
 	syscall
