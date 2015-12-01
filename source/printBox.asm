@@ -1,12 +1,12 @@
 ################################################################
 #	|---+---+---|		Menu:
-#	| 0 | 1 | 2 |		1. Quit
-#	|---+---+---|		2. Shuffle letters in box
-#	| 3 | 4 | 5 |		3. blah
-#	|---+---+---|		4. blah
-#	| 6 | 7 | 8 |		5. blah
+#	| 0 | 1 | 2 |		1. Shuffle letters.
+#	|---+---+---|		2. Guess a word.
+#	| 3 | 4 | 5 |		3. Quit.
+#	|---+---+---|		-------------------
+#	| 6 | 7 | 8 |		
 #	|---+---+---|
-#	enter choice here: 
+#	Enter your choice:  
 #
 ################################################################
 
@@ -21,6 +21,9 @@ printWordBox:
 	syscall
 	
 	################# menuLine1 if wanted, otherwise newline
+	la 	$a0, menuLine1
+	li 	$v0, 4
+	syscall
 	
 	la 	$a0, gridLeft	# "\t| "
 	li 	$v0, 4
@@ -51,12 +54,18 @@ printWordBox:
 	syscall
 	
 	################# menu line or newline
+	la 	$a0, menuLine2
+	li 	$v0, 4
+	syscall
 	
 	la $a0, gridLong	#  "|---+---+---|"
 	li 	$v0, 4
 	syscall
 	
 	################# menu line or newline
+	la 	$a0, menuLine3
+	li 	$v0, 4
+	syscall
 	
 	la 	$a0, gridLeft	# "\t| "
 	li 	$v0, 4
@@ -87,12 +96,18 @@ printWordBox:
 	syscall
 	
 	################# menu line or newline
+	la 	$a0, menuLine4
+	li 	$v0, 4
+	syscall
 	
 	la $a0, gridLong	#  "|---+---+---|"
 	li 	$v0, 4
 	syscall
 	
 	################# menu line or newline
+	la 	$a0, menuLine5
+	li 	$v0, 4
+	syscall
 	
 	la 	$a0, gridLeft	# "\t| "
 	li 	$v0, 4
@@ -123,11 +138,21 @@ printWordBox:
 	syscall
 	
 	################# menu line or newline
+	la 	$a0, newLine
+	li 	$v0, 4
+	syscall
 	
 	la $a0, gridLong	#  "|---+---+---|"
 	li 	$v0, 4
 	syscall
 	
 	################ menu line or newline
+	la 	$a0, newLine
+	li 	$v0, 4
+	syscall
+	
+	la 	$a0, menuLineInput	# "Enter your choice:  "
+	li 	$v0, 4
+	syscall
 	
 	jr $ra		# return
