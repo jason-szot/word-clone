@@ -12,7 +12,7 @@ randNumber:
 	
 ########################################
 #takes a string at $a0 and reads the length.
-#t0 is scanner, t1 is couter, t2 is scanners held value.
+#t0 is scanner, t1 is counter, t2 is scanners held value.
 #Retuns length in v1 
 getLength:
 	add $t0, $a0, $zero
