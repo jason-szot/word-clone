@@ -24,6 +24,7 @@ importFile:
 	li $a2, 0
 	syscall			# open file, file descriptor returned to $v0
 	move $t9, $v0		# file descriptor saved in $t9
+	li   $v0, 14 		# added by Eric C. (System call for read file. )
 	la $a1, dictionary	# address of dictionary space
 	li $a2, 500000		# buffer size ( largest file size is 614kb )
 	syscall			# read from the file
