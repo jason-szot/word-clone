@@ -1,3 +1,7 @@
+#THE POWER FRIENDS - Logan Morris, Jason Szot, Jamie Taylor, Eric Cooper
+#NOTE: The Mars.jar has to be in the same directory as the dictionary files for it to work
+
+
 ######### macros for the program ##########
 
 # WordArray
@@ -11,11 +15,13 @@ lw %x, ($t8)		# pointer = array[num]
 .end_macro
 
 .data
-###################### Prints for when the program is loading certain aspects of operation
+###################### Prints for when the program is loading certain aspects of operation, etc.
 loadingFilePrint:
 	.asciiz "Reading dictionary file ... "
 loadingIntoMemoryPrint:
 	.asciiz "Loading words into memory ... "
+getWord:
+.asciiz "Enter a string: "
 ###################### data needed for dictionary.asm
 fileName:
 	.asciiz"  .txt"
@@ -46,6 +52,12 @@ gridMiddle:
 	.asciiz " | "
 gridRight:
 	.asciiz " |\t\t\n"
+
+#################### Logan stuff
+userInput: .space 10   #Holds user's entered string
+wordArray: .space 50000 #Array of correct words that have already been entered by the user
+validText: .asciiz "That's a correct word!"
+invalidText: .asciiz "Sorry, that word was either incorrect or has been used already."
 .text
 
 
@@ -56,18 +68,18 @@ gridRight:
 
 # get a file name to load
 getFileName:
-	li $v0, 42		# 42 is rand int
+	li $v0, 42		# 42 is rand int range
 	li $a0, 0
-	li $a1, 25
+	li $a1, 25		#Range is 0-25, because there are 26 letters
 	syscall
-	addi $a0, $a0, 65
+	addi $a0, $a0, 65	#Add 65 to the random int to get a capital letter
 	#divu $t0, $a0, 26	# mod by 26 ( number of letters )
 	#mfhi $v0		# move from hi (rand MOD 26)
 	#addi $v0, $v0, 'A'	# convert rand mod 26 to capital letter
 	la $t1, fileName	# fileName loaded into $t1
 	sb $a0, ($t1)		# store letter in fileName[0]
 	sb $zero, 1($t1)		# store NULL in fileName[1]
-	lb $a0, fileName
+	lb $a0, fileName	#TESTING INSTRUCTION, PRETTY SURE THIS ISN'T NEEDED
 	
 	#jr $ra			# return
 
@@ -82,10 +94,10 @@ importFile:
 	syscall			# open file, file descriptor returned to $v0
 	move $t9, $v0		# file descriptor saved in $t9
 	li $v0, 4
-	la $a0, loadingFilePrint
+	la $a0, loadingFilePrint #Prints out to the user to show that the file is being read
 	syscall
 	li $v0, 14
-	move $a0, $t9
+	move $a0, $t9		#Move file descriptor into $a0, so it knows what to read
 	la $a1, dictionary	# address of dictionary space
 	li $a2, 500000		# buffer size ( largest file size is 614kb ) 500000
 	syscall			# read from the file
@@ -101,12 +113,13 @@ importFile:
 # fill the dictionary array of pointers
 fillDictionaryArray:
 	li $v0, 4
-	la $a0, loadingIntoMemoryPrint
+	la $a0, loadingIntoMemoryPrint #Shows the user that the file has been read and is now being stored into memory
 	syscall
 	la $a0, dictionary	# dictionary space pointer in $a0 ( scanner )
 	la $a1, dictionaryArray	# dictionaryArray[0] in $a1
 	#addi $a0, $a0, 1		Something I was using to skip the first *, probably not needed
 	sw $a0, ($a1)		# store pointer position to dictionaryArray[0]
+	
 	add $v1, $0, $0		# wordCount stored in $v1, initialize to 0
 	add $v1, $v1, 1		# add 1 to wordCount
 	add $a1, $a1, 4		# $a1 i for dictionaryArray[i]
@@ -123,7 +136,7 @@ fillDictionaryArrayLoop:
 	####
 	beq $t0, 0, fillDictionaryArrayReturn	# return if hit NULL
 	bne $t0, 10, fillSkipped	# didnt hit newline, move forward
-	sb $zero, ($a0)		# replace newline with NULL
+	#sb $zero, ($a0)		# replace newline with NULL
 	add $a0, $a0, 1		# scanner++
 	sw $a0, ($a1)		# dictionaryArray[i] = scanner
 	add $a1, $a1, 4		# i++
@@ -149,11 +162,11 @@ getNineLetter:
 	sw $s5, 16($sp)		# store $s5 on stack
 	sw $s6, 20($sp)		# store $s6 to stack
 	la $t9, dictionaryArray	# load address of dictionary array into $t9
-	add $s6, $zero, $zero
+	add $s6, $zero, $zero	#Make sure $s6 is zero before it is worked with
 getNineLetLoop:
 	lw $a0, lengthOfList	# load length of the word list to $a0 for random number function
 	jal randNum		# get a random number returned to $v0
-	move $s6, $v0		# store random number in $t8
+	move $s6, $v0		# store random number in $s6
 	WordArray ($a0, $t9, $s6)	# picks a random word from the word array, stores in $a0
 	jal getLength		# gets length of word in $a0, returns to $v1
 	beq $v1, 9, getNineLetReturn	# if $v1 = 9, it found the 9 letter word, jump to return
@@ -183,14 +196,16 @@ fillCorrectArrayFindTop:
 	j fillCorrectArrayFindTop	# loop up, * not found
 fillCorrectTopFound:
 	li $t0, 0		# set $t0 to zero
-	addi $s4, $s4, 2	# add 2 to the number in $s4
+	addi $s4, $s4, 2	# add 2 to the number in $s4  (Moves it to the first word in a partition)           
 	la $s5, correctWordsPointerArray	# load address of the words array to $s5
 fillCorrectArrayLoop:
 	WordArray ($a0, $t9, $s4)	# store letter address in $a0
 	lb $t0, ($a0)		# load letter to $t0
 	beq $t0, '*', fillCorrectArrayReturn	# end of words for this 9 letter word
-	sw $t0, ($s5)		# store letter address to correctWordsPointerArray[i]
+	sw $a0, ($s5)		# store letter address to correctWordsPointerArray[i]
 	lw $t8, totalPossibleWords	# load wordCount for correct words in $t8
+	addi $t8, $t8, 4		#NEW, add 4 to totalPossibleWords
+	sw $t8, totalPossibleWords	#NEW, store new value
 	addi $s4, $s4, 1		# increment pos for wordArray[pos]
 	addi $s5, $s5, 4		# increment correctWordsPointerArray
 	j fillCorrectArrayLoop		# loop
@@ -425,18 +440,131 @@ printWordBox:
 	
 	################ menu line or newline
 	
-	jr $ra		# return
+	#jr $ra		# return
 
+
+getInput:
+	#addi $sp, $sp, -4	# make room on the stack
+	#sw   $ra, 0($sp)	# save the return address
+	la   $a0, getWord	
+	li   $v0, 4		# system call for print string
+	syscall
+	
+	la   $a0, userInput	# user input is the word being entered 
+	la   $a1, userInput	
+	li   $v0, 8		# system call for read string
+	syscall
+	li   $v0, 4		# system call for print string
+	syscall
+	move $s0, $a0		# move word into $s0
+	jal allCapsBegin
+	la $a0, userInput
+	syscall
+	#jr $ra
+	j compareWordsBegin
+	
+#############################
+	
+ compareWordsBegin:
+ lw $t0, totalPossibleWords #get the totalPossibleWords, which is how many words there are multiplied by 4 basically
+ add $a0, $t0, $zero	#Move value to $a0
+ li $t0, 0		#Set $t0 to 0, because it is a counter
+compareWords: 
+  add $t1, $zero, $zero                    #reset the offset counter 
+  beq $t0, $a0, wrongUserInput             #indicates that the user input was not found in the dictionary
+  la $t7, correctWordsPointerArray($t0)        #$t7 points to the index of correctWordsPointerArray that holds the address of a string
+  addi $t0, $t0, 4                         #counter for how many words have been checked
+  lw $t6, ($t7)                       #$t6 points to the base address of a string
+#testloop:
+#add $t5, $t6, $t1
+#lb $t4, ($t5)
+#add $a0, $t4, $zero
+#li $v0, 11
+#syscall
+#addi $t1, $t1, 1
+#j testloop
+comparisonLoop:
+  add $t5, $t6, $t1                      #points to the character at the $t1-th spot in the loaded string ($t1 = i in String[i])
+  lb $t4, ($t5)                           #loads that character into $t4
+  add $s1, $s0, $t1                       #Points to the character in the same position from the user input
+  lb $s2, ($s1)                           #Loads the character into $s2
+  addi $t1, $t1, 1                         #increment position
+  beq $t4, $s2, checkNull                 #If the 2 are the same character, check to see if they are both newline
+  bne $t4, $s2, compareWords                #If not, go to the next word in the array, as the user input is not equal to this one
+
+
+
+checkNull:
+  beq $t4, 10, moveToFoundWords         #Check to see if this word has been entered before, as it is a correct word
+  j comparisonLoop
+
+moveToFoundWords: 
+  add $t5, $zero, $zero
+  add $t4, $zero, $zero
+  add $t0, $zero, $zero           #clear counters
+
+
+#$t5 is the offset for $t3 and $s0
+#$t4 contains the character that $t3 is pointing to
+#$t3 points to an individual character in the wordArray string
+#$t2 points to a base address of a string
+#$t1 points to the wordArray offset by $t0
+#$t0 is the offset for wordArray
+#$s2 contains the character pointed to by $s1
+#$s1 points to a character in the user input
+#$s0 contains the user input
+compareFoundWords: 
+  add $t4, $zero, $zero				#Reset $t4
+  beq $t0, $s7, addToFoundWords                     #The word was not found in wordArray, so it is a new correct word that must be entered
+  la $t1, wordArray($t0)                            #load wordArray[i], where $t0 is i
+  addi $t0, $t0, 4                                  #increment wordArray offset
+  lw $t2, ($t1)                             	#t2 points to base address of a string
+comparisonLoop2:
+  add $t3, $t2, $t5                                #Points to character at the $t5-th offset of the string pointed to by $t2
+  lb $t4, ($t3)                                     #Load character into $t4
+  add $s1, $s0, $t5                                 #Point to character in same position from user input
+  lb $s2, ($s1)                                     #Load character into $s2
+  addi $t5, $t5, 1                                  #Increment counter
+  beq $t4, $s2, checkNull2                          #If they are equal, check to see if they are both '0', that means they are the same string
+  bne $t4, $s2, compareFoundWords                   #If not, move on to the next string in the array
+
+
+checkNull2:
+  beq $t4, 10, wrongUserInput                        #If they are the same string, the string has been entered before
+  j comparisonLoop2
+
+addToFoundWords:        #$s7 stores the offset needed to find an empty space in the wordArray array. You can store a new word at that offset.
+  beq $t0, $s7, addWord 
+  addi $t0, $t0, 4                               #Continuously add 4 to $t0 until it equals $s7
+addWord:
+  lw $t7, ($t7)				#$t7 loads the address that it was previously pointing to
+  sw $t7, wordArray($t0)                    # Store this address in the wordArray
+  addi $s7, $s7, 4                          # Increment $s7
+  j rightUserInput
+  
+  
+  ####################################################################
+  wrongUserInput:
+	la $a0, invalidText
+	li $v0, 4
+	syscall #Tell the user that their word was wrong, go back to show the grid again probably
+	j getInput
+	
+rightUserInput:
+	la $a0, validText
+	li $v0, 4
+	syscall #Same thing, but tell them that they were right
+	j getInput
 ###########################################################################################
 #a0 gives the upper limit too use. v0 is the output.
 randNum:
 	move $a1, $a0    #NEW
-	li $a0, 0        #NEW
-	li   $v0, 42       # random int
+	li $a0, 0        #NEW 
+	li   $v0, 42       # random int range, range is representative of how big the dictionaryArray is
 	syscall
 	#divu $t0, $a0, $t9   #mod the length        
 	#mfhi $v0
-	move $v0, $a0
+	move $v0, $a0	#Move the resultant random number to $v0
 	jr $ra
 	
 ########################################
@@ -448,10 +576,31 @@ getLength:
 	li $t1, 0
 getLengthLoop:	
 	lb $t2, ($t0)
-	beq $t2, 0, getLengthReturn
+	beq $t2, 10, getLengthReturn
 	add $t1, $t1, 1 #advance counter
 	add $t0, $t0, 1 #advance scanner
 	j getLengthLoop
 getLengthReturn:
 	move $v1, $t1
 	jr $ra
+	
+######################################
+#Makes a string all-caps (string is in $s0
+allCapsBegin:
+li $t1, 0  #$t1 will be a counter to go through the string with
+allCaps:
+add $t2, $s0, $t1 #Move $t2 to element of string
+lb $t3, ($t2) #Load the character
+beq $t3, 10, allCapsReturn #newline = end of string, finish the function
+bge $t3, 97, makeCapital #If its 97 or greater, it is a lowercase letter. Make it capital
+addi $t1, $t1, 1
+j allCaps
+makeCapital:
+addi $t3, $t3, -32  #lowercase letter - 32 = uppercase letter in ASCII
+sb $t3, ($t2)	#Store the uppercase letter
+addi $t1, $t1, 1
+j allCaps
+allCapsReturn:
+jr $ra
+
+exit:
