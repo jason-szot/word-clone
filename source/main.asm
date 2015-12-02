@@ -30,7 +30,7 @@ endGame:
 
 
 ############################################################
-################	data for program	####################
+################	data for program	############
 ############################################################
 		.data
 		# main.asm variables/strings
@@ -68,10 +68,9 @@ wordArray:	.space 10000
 fileName:
 	.asciiz	"    "
 dictionary:
-	.align 4
 	.space 500000
 dictionaryArray:
-	.align	4
+	.align	2
 	.space 368000
 lengthOfList:
 	.word	0
