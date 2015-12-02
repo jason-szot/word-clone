@@ -1,4 +1,3 @@
-
 ######### macros for the program ##########
 
 # WordArray

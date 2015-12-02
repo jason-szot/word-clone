@@ -4,19 +4,14 @@
 
 # get a file name to load
 getFileName:
-	li $v0, 42		# 42 is rand int range
-	li $a0, 0
-	li $a1, 25		#Range is 0-25, because there are 26 letters
+	li $v0, 41		# 41 is rand int
 	syscall
-	addi $a0, $a0, 65	#Add 65 to the random int to get a capital letter
-	#divu $t0, $a0, 26	# mod by 26 ( number of letters )
-	#mfhi $v0		# move from hi (rand MOD 26)
-	#addi $v0, $v0, 'A'	# convert rand mod 26 to capital letter
+	divu $t0, $a0, 26	# mod by 26 ( number of letters )
+	mfhi $v0		# move from hi (rand MOD 26)
+	addi $v0, $v0, 'A'	# convert rand mod 26 to capital letter
 	la $t1, fileName	# fileName loaded into $t1
-	sb $a0, ($t1)		# store letter in fileName[0]
+	sb $v0, ($t1)		# store letter in fileName[0]
 	sb $zero, 1($t1)		# store NULL in fileName[1]
-	lb $a0, fileName	#TESTING INSTRUCTION, PRETTY SURE THIS ISN'T NEEDED
-	
 	jr $ra			# return
 
 ############################################################
@@ -29,18 +24,20 @@ importFile:
 	li $a2, 0
 	syscall			# open file, file descriptor returned to $v0
 	move $t9, $v0		# file descriptor saved in $t9
+	####### print reading dictionary file
 	li $v0, 4
-	la $a0, loadingFilePrint #Prints out to the user to show that the file is being read
+	la $a0, loadingFilePrint
 	syscall
-	li $v0, 14
-	move $a0, $t9		#Move file descriptor into $a0, so it knows what to read
+	li $v0, 14		# read from file is 14
+	move $a0, $t9		# file descriptor back to $a0
 	la $a1, dictionary	# address of dictionary space
-	li $a2, 500000		# buffer size ( largest file size is 614kb ) 500000
+	li $a2, 500000		# buffer size ( largest file size is 614kb )
 	syscall			# read from the file
 	li $v0, 16		# 16 is close file
-	move $a0, $t9		# file descriptor to close
-	syscall
+	move $a0, $t9		# file descriptor back to $a0
+	syscall			
 	jr $ra			# return
+
 
 ###########################################################
 # $a0 is scanner position
@@ -49,30 +46,20 @@ importFile:
 # fill the dictionary array of pointers
 fillDictionaryArray:
 	li $v0, 4
-	la $a0, loadingIntoMemoryPrint #Shows the user that the file has been read and is now being stored into memory
+	la $a0, loadingIntoMemoryPrint
 	syscall
 	la $a0, dictionary	# dictionary space pointer in $a0 ( scanner )
 	la $a1, dictionaryArray	# dictionaryArray[0] in $a1
-	#addi $a0, $a0, 1		Something I was using to skip the first *, probably not needed
 	sw $a0, ($a1)		# store pointer position to dictionaryArray[0]
-	
-	add $v1, $0, $0		# wordCount stored in $v1, initialize to 0
+	li $v1, 0		# wordCount stored in $v1, initialize to 0
 	add $v1, $v1, 1		# add 1 to wordCount
 	add $a1, $a1, 4		# $a1 i for dictionaryArray[i]
 fillDictionaryArrayLoop:
 	lb $t0, ($a0)		# load byte from dictionary ( letter )
-	####
-	#addi $sp, $sp, -4
-	#sw $a0, ($sp)
-	#add $a0, $zero, $t0	This printed out words as they were read by the scanner, I was using this for testing
-	#li $v0, 11
-	#syscall
-	#lw $a0, ($sp)
-	#addi $sp, $sp, 4
-	####
 	beq $t0, 0, fillDictionaryArrayReturn	# return if hit NULL
 	bne $t0, 10, fillSkipped	# didnt hit newline, move forward
-	#sb $zero, ($a0)		# replace newline with NULL
+	#lb $v0, null
+	#sb $v0, ($a0)		# replace newline with NULL
 	add $a0, $a0, 1		# scanner++
 	sw $a0, ($a1)		# dictionaryArray[i] = scanner
 	add $a1, $a1, 4		# i++
@@ -98,7 +85,7 @@ getNineLetter:
 	sw $s5, 16($sp)		# store $s5 on stack
 	sw $s6, 20($sp)		# store $s6 to stack
 	la $t9, dictionaryArray	# load address of dictionary array into $t9
-	add $s6, $zero, $zero	#Make sure $s6 is zero before it is worked with
+	li $s6, 0		# set $s6 to zero
 getNineLetLoop:
 	lw $a0, lengthOfList	# load length of the word list to $a0 for random number function
 	jal randNum		# get a random number returned to $v0
@@ -106,15 +93,15 @@ getNineLetLoop:
 	WordArray ($a0, $t9, $s6)	# picks a random word from the word array, stores in $a0
 	jal getLength		# gets length of word in $a0, returns to $v1
 	beq $v1, 10, getNineLetReturn	# if $v1 = 10, it found the 9 letter word, jump to return
-	addi $s6, $s6, 1
+	addi $s6, $s6, 1	
 	j getNineLetLoop	# go back to loop again, look for 9 letter word
 getNineLetReturn:
 	la $s3, wordInBox	# load address of space to $s3
 	move $s4, $s6		# move random number to $s4
 	WordArray ($s2, $t9, $s4)	
 	li $t0, 0		# store zero in $t0 ( counter )
-getNineLetReturnLoop:
-	beq $t0, 11, fillCorrectArray	# when counter hits 11, jump to filling the array
+getNineLetReturnLoop:		# saves the 9 letter word to wordInBox
+	beq $t0, 11, fillCorrectArray	# when counter hits 9, jump to filling the array
 	lb $t1, ($s2)		# load letter from $s2 into $t1
 	sb $t1, ($s3)		# store letter into wordInBox
 	add $s3, $s3, 1		# increment wordInBox space by 1
@@ -126,28 +113,29 @@ fillCorrectArray:
 fillCorrectArrayFindTop:
 	addi $s4, $s4, -1	# reduce the randum number by 1
 	
-	WordArray ($a0, $t9, $s4)	# get a letter from the $s4 position of the list
+	WordArray ($a0, $t9, $s4)	# get a letter from the $s4 position of the list, should be the * character before the 9 letter word
 	lb $t0, ($a0)		# load the letter to $t0
 	beq $t0, '*', fillCorrectTopFound	# the * is the seperator between word lists
 	j fillCorrectArrayFindTop	# loop up, * not found
 fillCorrectTopFound:
 	li $t0, 0		# set $t0 to zero
-	addi $s4, $s4, 2	# add 2 to the number in $s4  (Moves it to the first word in a partition)           
+	addi $s4, $s4, 2	# add 2 to the number in $s4
 	la $s5, correctWordsPointerArray	# load address of the words array to $s5
+	li $t7, 0		# counter for number of words correct  correct = 0
 fillCorrectArrayLoop:
 	WordArray ($a0, $t9, $s4)	# store letter address in $a0
 	lb $t0, ($a0)		# load letter to $t0
 	beq $t0, '*', fillCorrectArrayReturn	# end of words for this 9 letter word
-	sw $a0, ($s5)		# store letter address to correctWordsPointerArray[i]
-	lw $t8, totalPossibleWords	# load wordCount for correct words in $t8
-	addi $t8, $t8, 4		#NEW, add 4 to totalPossibleWords
-	sw $t8, totalPossibleWords	#NEW, store new value
+	sw $t0, ($s5)		# store letter address to correctWordsPointerArray[i]
+	add $t7, $t7, 1		# counter++
 	addi $s4, $s4, 1		# increment pos for wordArray[pos]
 	addi $s5, $s5, 4		# increment correctWordsPointerArray
 	j fillCorrectArrayLoop		# loop
 fillCorrectArrayReturn:
+	la $t9, totalPossibleWords	# load address of wordcount to $t9
+	sw $t7, ($t9)			# store counter to totalPossibleWords
 	
-getNineLetReturn2:
+	# load info back from stack
 	lw $ra, ($sp)		# load return address from stack
 	lw $s2, 4($sp)		# load $s2 from stack
 	lw $s3, 8($sp)		# load $s3 from stack
@@ -155,7 +143,6 @@ getNineLetReturn2:
 	lw $s5, 16($sp)		# load $s5 from stack
 	lw $s6, 20($sp)		# load $s6 from stack
 	subi $sp, $sp, 20	# move stack pointer
-	#j randomizeWord
 	jr $ra			# return
 
 ##############################################################
@@ -196,6 +183,7 @@ randomWordReturn:
 randomWordDone:
 	jr $ra			# return
 	
+	
 ##########################################################
 
 # shuffle - same algorithm as randomize, but leave spot 4 alone
@@ -205,14 +193,14 @@ shuffleWord:
 shuffleWordLoop:
 	beq $t0, 9, shuffleWordReturn	# done with shuffle
 	beq $t0, 4, shuffleIncreaseCounter	# to save center letter
-	addi $v0, $zero, 30	# get time
+	li $v0, 30			# get time
 	syscall
-	addi $v0, $zero, 40	# set seed for random from return of time
+	li $v0, 40			# set seed for random from return of time
 	syscall
-	addi $v0, $zero, 41	# random int return to $a0
+	li $v0, 41			# random int return to $a0
 	syscall
 	move $t1, $a0		# save rand number to $t1
-	addi $t2, $zero, 9	# for mod 9
+	li $t2, 9		# for mod 9
 	divu $t1, $t2		# $t1 mod $t2 ( randint MOD 9
 	mfhi $t1		# number saved to $t1
 	bne $t1, 4, shuffleContinue	# saves center letter

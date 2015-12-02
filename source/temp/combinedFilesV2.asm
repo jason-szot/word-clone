@@ -169,7 +169,7 @@ getNineLetLoop:
 	move $s6, $v0		# store random number in $s6
 	WordArray ($a0, $t9, $s6)	# picks a random word from the word array, stores in $a0
 	jal getLength		# gets length of word in $a0, returns to $v1
-	beq $v1, 9, getNineLetReturn	# if $v1 = 9, it found the 9 letter word, jump to return
+	beq $v1, 10, getNineLetReturn	# if $v1 = 9, it found the 9 letter word, jump to return
 	addi $s6, $s6, 1
 	j getNineLetLoop	# go back to loop again, look for 9 letter word
 getNineLetReturn:
