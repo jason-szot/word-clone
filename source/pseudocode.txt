@@ -1,0 +1,24 @@
+setup game
+game loop:
+outputtouser: output to user
+input: user input
+processing
+loop up
+output:
+print box
+processing:
+user input for 1 2 or 3
+if 2, input validation
+if 3, quit screen
+if 1, shuffle and return to outputtouser
+input validation:
+center letter check
+correct word check
+
+correct: add score, output something, return
+incorrect: output something, return
+
+quit screen:
+display score, ask play again
+yes: setup game
+no: exit call

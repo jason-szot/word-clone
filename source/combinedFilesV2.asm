@@ -17,11 +17,11 @@ lw %x, ($t8)		# pointer = array[num]
 .data
 ###################### Prints for when the program is loading certain aspects of operation, etc.
 loadingFilePrint:
-	.asciiz "Reading dictionary file ... "
+	.asciiz "Reading dictionary file ... \n"
 loadingIntoMemoryPrint:
-	.asciiz "Loading words into memory ... "
+	.asciiz "Loading words into memory ... \n"
 getWord:
-.asciiz "Enter a string: "
+.asciiz "Enter a string between 4 and 9 characters (must contain the center character): "
 ###################### data needed for dictionary.asm
 fileName:
 	.asciiz"  .txt"
@@ -56,8 +56,8 @@ gridRight:
 #################### Logan stuff
 userInput: .space 10   #Holds user's entered string
 wordArray: .space 50000 #Array of correct words that have already been entered by the user
-validText: .asciiz "That's a correct word!"
-invalidText: .asciiz "Sorry, that word was either incorrect or has been used already."
+validText: .asciiz "That's a correct word!\n"
+invalidText: .asciiz "Sorry, that word was either incorrect or has been used already.\n"
 .text
 
 
