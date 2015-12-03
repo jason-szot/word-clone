@@ -83,6 +83,7 @@ moveToFoundWords:
 #$s0 contains the user input
 compareFoundWords: 
   add $t4, $zero, $zero				#Reset $t4
+  add $t5, $zero, $zero				#Reset $t5
   beq $t0, $s7, addToFoundWords                     #The word was not found in wordArray, so it is a new correct word that must be entered
   
   la $t1, gottenWords($t0)                            #load wordArray[i], where $t0 is i
