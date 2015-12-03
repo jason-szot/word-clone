@@ -1,0 +1,26 @@
+	*Word-Clone*
+
+Word-Clone is a game modeled after Lexathon - an Android game
+
+Group Members: Jason Szot, Logan Morris, Jamie Taylor and Eric Cooper
+
+Instructions:
+	1. Download the .zip file and extract the contents to a location of your preference.
+	2. Open and run Mars_4_5.jar 
+	3. Within Mars select Open File - navigate and select the main.asm file.
+	4. Assemble, run, and have fun.
+
+During Play:
+	- When playing Word-Clone, for menu selections - do not hit 'Enter' after inputting your selection.
+		(i.e. To enter a word just hit '2' and nothing else).
+
+	- Option 3 quits the game, although you are given the option to Play again or end the program.
+
+*Important: make sure that Mars is in the same directory as the rest of the files*
+
+Features/Limitations to Note:
+	- During play occasionally, you may enter a valid word but the program tells you it is not. This is likely due to the word being entered
+	  is not currently in the file that is loaded (not found).
+
+	- Scoring routine: 5 points for every correct word entered, 0 points for an incorrect word.
+
