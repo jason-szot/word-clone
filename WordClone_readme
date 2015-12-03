@@ -12,15 +12,30 @@ Instructions:
 
 During Play:
 	- When playing Word-Clone, for menu selections - do not hit 'Enter' after inputting your selection.
-		(i.e. To enter a word just hit '2' and nothing else).
+		(i.e. To choose the 'enter a word' option, just hit '2' and nothing else).
 
 	- Option 3 quits the game, although you are given the option to Play again or end the program.
+		(You must select between 1 and 2. You have to press the Enter key for this one!)
 
 *Important: make sure that Mars is in the same directory as the rest of the files*
 
-Features/Limitations to Note:
+Features:
+	- Text that displays when the program is reading files and loading into memory, to give the user a better understanding of what 
+	is being done.
+	- A menu with options to shuffle the characters in the box, enter a word, or quit
+	- The menu knows when a choice that isn't listed has been selected, tells the user, and lets them make another choice.
+	- The shuffle option shuffles every character in the box except for the center character. To get a new center character,
+	and therefore a new game, choose the quit option, and then select Play Again.
+	- The quit option gives you the choice to play again, which starts a brand new game with new words and characters. It 
+	also gives you the option to exit the program.
+	- All rules for choosing a word have been implemented. Entering a word that does not have the center character, or is
+	otherwise not a possible word, will earn no points.
+	- Scoring routine: 5 points for every correct word entered, 0 points for an incorrect word.
+Limitations to Note:
 	- During play occasionally, you may enter a valid word but the program tells you it is not. This is likely due to the word being entered
 	  is not currently in the file that is loaded (not found).
-	- Mars 4_5.jar and other files dependent on Word-Clone must all be located in the same directory location in order to run. 
-	- Scoring routine: 5 points for every correct word entered, 0 points for an incorrect word.
+	- Mars 4_5.jar and other files dependent on Word-Clone must all be located in the same directory location in order to run.
+	- Exiting the program through abnormal means may cause the game to behave strangely if it is ran again. To quit the program, please
+	choose option 3 on the menu, to quit.
+	
 
