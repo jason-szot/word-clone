@@ -6,7 +6,7 @@ Group Members: Jason Szot, Logan Morris, Jamie Taylor and Eric Cooper
 
 Instructions:
 	1. Download the .zip file and extract the contents to a location of your preference.
-	2. Open and run Mars_4_5.jar 
+	2. Open and run Mars_4_5.jar which is included in the zip file.
 	3. Within Mars select Open File - navigate and select the main.asm file.
 	4. Assemble, run, and have fun.
 
@@ -21,6 +21,6 @@ During Play:
 Features/Limitations to Note:
 	- During play occasionally, you may enter a valid word but the program tells you it is not. This is likely due to the word being entered
 	  is not currently in the file that is loaded (not found).
-
+	- Mars 4_5.jar and other files dependent on Word-Clone must all be located in the same directory location in order to run. 
 	- Scoring routine: 5 points for every correct word entered, 0 points for an incorrect word.
 
