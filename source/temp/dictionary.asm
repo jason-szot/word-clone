@@ -136,12 +136,13 @@ fillCorrectTopFound:
 	la $s5, correctWordsPointerArray	# load address of the words array to $s5
 fillCorrectArrayLoop:
 	WordArray ($a0, $t9, $s4)	# store letter address in $a0
-	lb $t0, ($a0)		# load letter to $t0
+	lb $t0, ($a0)			# load letter to $t0
 	beq $t0, '*', fillCorrectArrayReturn	# end of words for this 9 letter word
-	sw $a0, ($s5)		# store letter address to correctWordsPointerArray[i]
-	lw $t8, totalPossibleWords	# load wordCount for correct words in $t8
-	addi $t8, $t8, 4		#NEW, add 4 to totalPossibleWords
-	sw $t8, totalPossibleWords	#NEW, store new value
+	sw $a0, ($s5)			# store letter address to correctWordsPointerArray[i]
+	la $v0, totalPossibleWords	# load wordCount for correct words in $t8
+	lw $t8, ($v0)
+	addi $t8, $t8, 1		#NEW, add 4 to totalPossibleWords
+	sw $t8, ($v0)			#NEW, store new value
 	addi $s4, $s4, 1		# increment pos for wordArray[pos]
 	addi $s5, $s5, 4		# increment correctWordsPointerArray
 	j fillCorrectArrayLoop		# loop

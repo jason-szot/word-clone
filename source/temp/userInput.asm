@@ -23,14 +23,14 @@ getInput:
 #############################
 	
  compareWordsBegin:
- lw $t0, totalPossibleWords #get the totalPossibleWords, which is how many words there are multiplied by 4 basically
- add $a0, $t0, $zero	#Move value to $a0
+ la $t0, totalPossibleWords 	#get the totalPossibleWords, which is how many words there are multiplied by 4 basically
+ lw $a0, ($t0)			#Move value to $a0
  li $t0, 0		#Set $t0 to 0, because it is a counter
 compareWords: 
   add $t1, $zero, $zero                    #reset the offset counter 
   beq $t0, $a0, wrongUserInput             #indicates that the user input was not found in the dictionary
   la $t7, correctWordsPointerArray($t0)        #$t7 points to the index of correctWordsPointerArray that holds the address of a string
-  addi $t0, $t0, 4                         #counter for how many words have been checked
+  addi $t0, $t0, 1                         #counter for how many words have been checked
   lw $t6, ($t7)                       #$t6 points to the base address of a string
 #testloop:
 #add $t5, $t6, $t1

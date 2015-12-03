@@ -7,8 +7,9 @@
 	.include "dictionary.asm"
 	.include "setup.asm"
 	.include "printBox.asm"
-	.include "userInput.asm"
+	#.include "userInput.asm"
 	.include "useful.asm"
+	.include "validation.asm"
 
 	#########################################################
 	############	Program Main Section	#################
@@ -65,9 +66,23 @@ gridMiddle:
 	.asciiz " | "
 gridRight:
 	.asciiz " |\t\t\n"
+newLine:
+	.asciiz "\n"
 
 #################### Logan stuff
-userInput: .space 10   #Holds user's entered string
-wordArray: .space 50000 #Array of correct words that have already been entered by the user
+userInput: .space 20   #Holds user's entered string
+wordArray:
+	.align 2
+	.space 50000 #Array of correct words that have already been entered by the user
 validText: .asciiz "That's a correct word!\n"
 invalidText: .asciiz "Sorry, that word was either incorrect or has been used already.\n"
+
+## added to help with validation
+
+correctUserInput:	# compare pointers, not entire words
+	.align 2
+	.word 0
+
+correctWordCount:	# count of correct words in wordArray
+	.align 2
+	.word 0
