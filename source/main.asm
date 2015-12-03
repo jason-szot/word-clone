@@ -23,7 +23,7 @@ playGame:
 startGame:
 	addi $sp, $sp, -4	# make room on the stack
 	sw   $ra, 0($sp)	# saves the return address
-endGame:
+exitGame:
 	li $v0, 10		# system call for end program. 
 	syscall
 
