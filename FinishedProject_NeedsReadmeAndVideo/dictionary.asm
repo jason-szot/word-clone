@@ -111,7 +111,7 @@ getNineLetLoop:
 	jal getLength		# gets length of word in $a0, returns to $v1
 	lw $ra, 0($sp)
 	addi $sp, $sp, 4
-	beq $v1, 10, getNineLetReturn	# if $v1 = 10, it found the 9 letter word, jump to return
+	beq $v1, 9, getNineLetReturn	# if $v1 = 10, it found the 9 letter word, jump to return
 	addi $s6, $s6, 1	
 	j getNineLetLoop	# go back to loop again, look for 9 letter word
 getNineLetReturn:
@@ -120,7 +120,7 @@ getNineLetReturn:
 	WordArray ($s2, $t9, $s4)	
 	li $t0, 0		# store zero in $t0 ( counter )
 getNineLetReturnLoop:		# saves the 9 letter word to wordInBox
-	beq $t0, 10, fillCorrectArray	# when counter hits 9, jump to filling the array
+	beq $t0, 11, fillCorrectArray	# when counter hits 9, jump to filling the array
 	lb $t1, ($s2)		# load letter from $s2 into $t1
 	sb $t1, ($s3)		# store letter into wordInBox
 	add $s3, $s3, 1		# increment wordInBox space by 1
